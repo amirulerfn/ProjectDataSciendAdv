@@ -65,12 +65,28 @@ except pd.errors.ParserError:
 # Replace item_code with grades
 df['item_code'] = df['item_code'].replace({118: 'A', 119: 'B', 120: 'C'})
 
+# Attempt to convert 'date' column to datetime with error handling
+try:
+    # Attempt to convert 'date' column with error handling and format coercion
+    df['date'] = pd.to_datetime(df['date'], format='%d/%m/%Y', errors='coerce')
+
+    # Check for invalid or missing dates (NaT)
+    invalid_dates = df[df['date'].isna()]
+    if not invalid_dates.empty:
+        st.warning(f"Warning: {len(invalid_dates)} rows have invalid or missing dates.")
+        st.write(invalid_dates)
+
+    # Optionally, drop rows with invalid dates
+    df = df.dropna(subset=['date'])
+
+except Exception as e:
+    st.error(f"Error occurred during date conversion: {e}")
+
 # Visualization 1: Item Counts per Premise (with premise instead of premise_code)
 grouped = df.groupby(['premise', 'item_code']).size().reset_index(name='jumlah')
 result = pd.merge(grouped, df[['premise', 'premise_type', 'district']], on='premise', how='left')
 result = result.drop_duplicates(subset=['premise', 'item_code'])
 
-st.subheader("Item Counts per Premise (by Grade):")
 plt.figure(figsize=(12, 6))
 sns.barplot(x='premise', y='jumlah', hue='item_code', data=result)
 plt.title('Item Counts per Premise')
@@ -78,12 +94,11 @@ plt.xlabel('Premise')
 plt.ylabel('Jumlah')
 plt.xticks(rotation=45, ha='right')
 plt.tight_layout()
-st.pyplot(plt)
+plt.show()
 
 # Visualization 2: Item Grade Counts per District
 grouped_district = df.groupby(['district', 'item_code'])['item_code'].count().reset_index(name='count')
 
-st.subheader("Item Grade Counts per District:")
 plt.figure(figsize=(12, 6))
 sns.barplot(x='district', y='count', hue='item_code', data=grouped_district)
 plt.title('Item Grade Counts per District')
@@ -91,19 +106,16 @@ plt.xlabel('District')
 plt.ylabel('Count')
 plt.xticks(rotation=45, ha='right')
 plt.tight_layout()
-st.pyplot(plt)
+plt.show()
 
 # Visualization 3: Distribution of Egg Grades (Pie Chart)
 grade_counts = df['item_code'].value_counts()
-
-st.subheader("Distribution of Egg Grades:")
 plt.figure(figsize=(8, 8))
 plt.pie(grade_counts, labels=grade_counts.index, autopct='%1.1f%%', startangle=90)
 plt.title('Distribution of Egg Grades')
-st.pyplot(plt)
+plt.show()
 
 # Visualization 4: Box plot of 'jumlah' (counts) per district
-st.subheader("Distribution of Item Counts per District:")
 plt.figure(figsize=(10, 6))
 sns.boxplot(x='district', y='jumlah', data=result)
 plt.title('Distribution of Item Counts per District')
@@ -111,12 +123,11 @@ plt.xlabel('District')
 plt.ylabel('Jumlah')
 plt.xticks(rotation=45, ha='right')
 plt.tight_layout()
-st.pyplot(plt)
+plt.show()
 
 # Visualization 5: Average Price per Grade at Each Premise
 grouped_price = df.groupby(['premise', 'item_code'])['price'].mean().reset_index()
 
-st.subheader("Average Egg Price per Grade at Each Premise:")
 plt.figure(figsize=(16, 8))
 sns.barplot(x='premise', y='price', hue='item_code', data=grouped_price)
 plt.title('Average Egg Price per Grade at Each Premise')
@@ -124,15 +135,13 @@ plt.xlabel('Premise')
 plt.ylabel('Average Price')
 plt.xticks(rotation=45, ha='right')
 plt.tight_layout()
-st.pyplot(plt)
+plt.show()
 
 # Visualization 6: Number of Eggs per Month by Grade
-df['date'] = pd.to_datetime(df['date'], format='%d/%m/%Y')
 df['month'] = df['date'].dt.month
 monthly_egg_counts = df.groupby(['month', 'item_code'])['item_code'].count().reset_index(name='count')
 monthly_egg_counts = monthly_egg_counts.sort_values(by='month')
 
-st.subheader("Number of Eggs per Month by Grade:")
 plt.figure(figsize=(12, 6))
 sns.barplot(x='month', y='count', hue='item_code', data=monthly_egg_counts, dodge=True)
 plt.title('Number of Eggs per Month by Grade')
@@ -144,4 +153,4 @@ plt.xticks(
 )
 plt.legend(title='Egg Grade')
 plt.tight_layout()
-st.pyplot(plt)
+plt.show()
