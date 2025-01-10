@@ -129,66 +129,35 @@ st.pyplot(plt)
 # Visualization 6: Number of Eggs per Month by Grade
  # Convert 'date' column to datetime objects
 # Convert 'date' column to datetime objects with error handling
-import pandas as pd
-import seaborn as sns
-import matplotlib.pyplot as plt
-import streamlit as st
+# Extract month and year
+df['month'] = df['date'].dt.month
+df['year'] = df['date'].dt.year
 
-# Streamlit app title
-st.title('Egg Counts per Month by Grade')
+# Replace item_code with grades
+df['item_code'] = df['item_code'].replace({118: 'A', 119: 'B', 120: 'C'})
 
-# Upload CSV file
-uploaded_file = st.file_uploader("Choose a CSV file", type="csv")
-if uploaded_file is not None:
-    # Load the data into a DataFrame
-    df = pd.read_csv(uploaded_file)
+# Group data by month and item_code, then count
+monthly_egg_counts = df.groupby(['month', 'item_code'])['item_code'].count().reset_index(name='count')
 
-    # Inspect the date column to ensure correct format and identify any issues
-    st.write("Preview of date column:")
-    st.write(df['date'].head())  # Display first few rows of the date column
-    st.write("Unique date values:")
-    st.write(df['date'].unique())  # Show unique date values
+# Sort the data by month
+monthly_egg_counts = monthly_egg_counts.sort_values(by='month')
 
-    # Clean the 'date' column by stripping any leading/trailing spaces
-    df['date'] = df['date'].str.strip()
+# Visualization 5: Egg Counts per Month by Grade
+st.subheader("Egg Counts per Month by Grade:")
+plt.figure(figsize=(16, 8))
+sns.barplot(x='month', y='count', hue='item_code', data=monthly_egg_counts, dodge=True)
+plt.title('Number of Eggs per Month by Grade')
+plt.xlabel('Month')
+plt.ylabel('Count')
+plt.xticks(
+    ticks=range(0, 12),  # Ensure ticks align with actual data indices
+    labels=['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+)
+plt.legend(title='Egg Grade')
+plt.tight_layout()
 
-    # Convert 'date' column to datetime objects with error handling
-    # Using errors='coerce' to handle invalid dates gracefully by converting them to NaT
-    df['date'] = pd.to_datetime(df['date'], format='%m/%d/%Y', errors='coerce')
-
-    # Check for any invalid date entries
-    invalid_dates = df[df['date'].isna()]
-    if not invalid_dates.empty:
-        st.write("Rows with invalid dates:")
-        st.write(invalid_dates)  # Display rows where 'date' is invalid
-
-    # Extract month and year
-    df['month'] = df['date'].dt.month
-    df['year'] = df['date'].dt.year
-
-    # Replace item_code with grades
-    df['item_code'] = df['item_code'].replace({118: 'A', 119: 'B', 120: 'C'})
-
-    # Group data by month and item_code, then count
-    monthly_egg_counts = df.groupby(['month', 'item_code'])['item_code'].count().reset_index(name='count')
-
-    # Sort the data by month
-    monthly_egg_counts = monthly_egg_counts.sort_values(by='month')
-
-    # Create the bar plot
-    plt.figure(figsize=(12, 6))
-    sns.barplot(x='month', y='count', hue='item_code', data=monthly_egg_counts, dodge=True)
-    plt.title('Number of Eggs per Month by Grade')
-    plt.xlabel('Month')
-    plt.ylabel('Count')
-    plt.xticks(
-        ticks=range(0, 12),  # Ensure ticks align with actual data indices
-        labels=['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-    )
-    plt.legend(title='Egg Grade')
-
-    # Display the plot in Streamlit
-    st.pyplot(plt)
+# Display the plot in Streamlit
+st.pyplot(plt)
 
 
 
