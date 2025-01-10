@@ -139,7 +139,7 @@ import streamlit as st
 st.title('Egg Counts per Month by Grade')
 
 # Static path to your CSV file
-file_path = 'your_file.csv'  # Replace with your actual file path
+file_path = 'telur kelantan filtered.csv'  # Replace with your actual file path
 
 # Load the data into a DataFrame
 df = pd.read_csv(file_path)
