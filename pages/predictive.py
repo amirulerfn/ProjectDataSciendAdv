@@ -37,7 +37,7 @@ for col in ['premise', 'premise_type', 'state', 'district', 'item', 'unit', 'ite
 df.drop(['date', 'address'], axis=1, inplace=True)
 
 # Split data into features and target
-X = df.drop(['state','premise_code','item_code'], axis=1)
+X = df[['item_code', 'month', 'premise_type', 'district']] 
 y = df['price']
 
 # Standardize features
