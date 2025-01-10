@@ -130,14 +130,40 @@ st.pyplot(plt)
  # Convert 'date' column to datetime objects
 # Convert 'date' column to datetime objects with error handling
 # Extract month and year
-df = pd.read_csv('telur kelantan filtered.csv')
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+import streamlit as st
+
+# Streamlit app title
+st.title('Egg Counts per Month by Grade')
+
+# Static path to your CSV file
+file_path = 'your_file.csv'  # Replace with your actual file path
+
+# Load the data into a DataFrame
+df = pd.read_csv(file_path)
+
 # Inspect the date column to ensure correct format and identify any issues
 st.write("Preview of date column:")
 st.write(df['date'].head())  # Display first few rows of the date column
 st.write("Unique date values:")
 st.write(df['date'].unique())  # Show unique date values
+
+# Clean the 'date' column by stripping any leading/trailing spaces
 df['date'] = df['date'].str.strip()
+
+# Convert 'date' column to datetime objects with error handling
+# Using errors='coerce' to handle invalid dates gracefully by converting them to NaT
 df['date'] = pd.to_datetime(df['date'], format='%m/%d/%Y', errors='coerce')
+
+# Check for any invalid date entries
+invalid_dates = df[df['date'].isna()]
+if not invalid_dates.empty:
+    st.write("Rows with invalid dates:")
+    st.write(invalid_dates)  # Display rows where 'date' is invalid
+
+# Extract month and year
 df['month'] = df['date'].dt.month
 df['year'] = df['date'].dt.year
 
@@ -152,20 +178,21 @@ monthly_egg_counts = monthly_egg_counts.sort_values(by='month')
 
 # Visualization 5: Egg Counts per Month by Grade
 st.subheader("Egg Counts per Month by Grade:")
-plt.figure(figsize=(16, 8))
-sns.barplot(x='month', y='count', hue='item_code', data=monthly_egg_counts, dodge=True)
-plt.title('Number of Eggs per Month by Grade')
-plt.xlabel('Month')
-plt.ylabel('Count')
-plt.xticks(
-    ticks=range(0, 12),  # Ensure ticks align with actual data indices
-    labels=['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-)
-plt.legend(title='Egg Grade')
+
+# Plotting
+fig, ax = plt.subplots(figsize=(16, 8))
+sns.barplot(x='month', y='count', hue='item_code', data=monthly_egg_counts, dodge=True, ax=ax)
+ax.set_title('Number of Eggs per Month by Grade')
+ax.set_xlabel('Month')
+ax.set_ylabel('Count')
+ax.set_xticks(range(0, 12))  # Ensure ticks align with actual data indices
+ax.set_xticklabels(['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'])
+ax.legend(title='Egg Grade')
 plt.tight_layout()
 
 # Display the plot in Streamlit
-st.pyplot(plt)
+st.pyplot(fig)
+
 
 
 
