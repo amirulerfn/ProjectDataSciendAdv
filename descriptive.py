@@ -141,7 +141,7 @@ df['date'] = df['date'].str.strip()
 
 # Convert 'date' column to datetime objects with error handling
 # Using errors='coerce' to handle invalid dates gracefully by converting them to NaT
-df['date'] = pd.to_datetime(df['date'], format='%Y/%m/%d', errors='coerce')
+df['date'] = pd.to_datetime(df['date'], format='%m/%d/%Y', errors='coerce')
 
 # Check for any invalid date entries
 invalid_dates = df[df['date'].isna()]
