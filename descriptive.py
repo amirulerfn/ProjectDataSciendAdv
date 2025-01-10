@@ -62,13 +62,6 @@ except FileNotFoundError:
 except pd.errors.ParserError:
     st.error("Error: Could not parse the file. Please check the file format.")
 
-import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
-
-# Load the dataset
-df = pd.read_csv('/content/telur kelantan filtered.csv')
-
 # Replace item_code with grades
 df['item_code'] = df['item_code'].replace({118: 'A', 119: 'B', 120: 'C'})
 
@@ -146,7 +139,3 @@ plt.legend(title='Egg Grade')
 plt.tight_layout()
 plt.show()
 
-except KeyError as e:
-    st.error(f"Error: Column '{e}' not found in the CSV file.")
-except Exception as e:
-    st.error(f"An unexpected error occurred: {e}")
