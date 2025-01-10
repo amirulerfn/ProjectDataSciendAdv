@@ -193,12 +193,4 @@ ax.legend(title='Egg Grade')
 # Display the plot in the Streamlit app
 st.pyplot(fig)  # Pass the 'fig' explicitly
 
-except FileNotFoundError:
-st.error("Error: File not found.")
-except pd.errors.ParserError:
-st.error("Error: Could not parse the file. Please check the file format.")
-except KeyError as e:
-        st.error(f"Error: Column '{e}' not found in the CSV file.")
-    except Exception as e:
-        st.error(f"An unexpected error occurred: {e}")
 
