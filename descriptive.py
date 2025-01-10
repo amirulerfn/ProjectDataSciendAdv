@@ -127,55 +127,74 @@ plt.tight_layout()
 st.pyplot(plt)
 
 # Visualization 6: Number of Eggs per Month by Grade
- # Convert 'date' column to datetime objects
-# Convert 'date' column to datetime objects with error handling
-# Extract month and year
-# Inspect the date column to ensure correct format and identify any issues
-st.write("Preview of date column:")
-st.write(df['date'].head())  # Display first few rows of the date column
-st.write("Unique date values:")
-st.write(df['date'].unique())  # Show unique date values
+import streamlit as st
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
 
-# Clean the 'date' column by stripping any leading/trailing spaces
-df['date'] = df['date'].str.strip()
+def load_data():
+    try:
+        # Replace with the actual file path or use a file uploader in Streamlit
+        df = pd.read_csv('telur kelantan filtered.csv')
 
-# Convert 'date' column to datetime objects with error handling
-# Using errors='coerce' to handle invalid dates gracefully by converting them to NaT
-df['date'] = pd.to_datetime(df['date'], format='%Y/%m/%d', errors='coerce')
+        # Convert 'date' column to datetime objects
+        df['date'] = pd.to_datetime(df['date'], format='%m/%d/%Y')
 
-# Check for any invalid date entries
-invalid_dates = df[df['date'].isna()]
-if not invalid_dates.empty:
-    st.write("Rows with invalid dates:")
-    st.write(invalid_dates)  # Display rows where 'date' is invalid
+        # Extract month and year
+        df['month'] = df['date'].dt.month
+        df['year'] = df['date'].dt.year
 
-# Extract month and year
-df['month'] = df['date'].dt.month
-df['year'] = df['date'].dt.year
+        # Replace item_code with grades
+        df['item_code'] = df['item_code'].replace({118: 'A', 119: 'B', 120: 'C'})
 
-# Replace item_code with grades
-df['item_code'] = df['item_code'].replace({118: 'A', 119: 'B', 120: 'C'})
+        return df
+    except FileNotFoundError:
+        st.error("Error: File not found.")
+    except pd.errors.ParserError:
+        st.error("Error: Could not parse the file. Please check the file format.")
+    except KeyError as e:
+        st.error(f"Error: Column '{e}' not found in the CSV file.")
+    except Exception as e:
+        st.error(f"An unexpected error occurred: {e}")
+    return None
 
-# Group data by month and item_code, then count
-monthly_egg_counts = df.groupby(['month', 'item_code'])['item_code'].count().reset_index(name='count')
+def plot_egg_counts(df):
+    # Group data by month and item_code, then count
+    monthly_egg_counts = df.groupby(['month', 'item_code'])['item_code'].count().reset_index(name='count')
 
-# Sort the data by month
-monthly_egg_counts = monthly_egg_counts.sort_values(by='month')
+    # Sort the data by month
+    monthly_egg_counts = monthly_egg_counts.sort_values(by='month')
 
-# Create the bar plot
-plt.figure(figsize=(12, 6))
-sns.barplot(x='month', y='count', hue='item_code', data=monthly_egg_counts, dodge=True)
-plt.title('Number of Eggs per Month by Grade')
-plt.xlabel('Month')
-plt.ylabel('Count')
-plt.xticks(
-    ticks=range(0, 12),  # Ensure ticks align with actual data indices
-    labels=['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-)
-plt.legend(title='Egg Grade')
+    # Create the bar plot
+    plt.figure(figsize=(12, 6))
+    sns.barplot(x='month', y='count', hue='item_code', data=monthly_egg_counts, dodge=True)
+    plt.title('Number of Eggs per Month by Grade')
+    plt.xlabel('Month')
+    plt.ylabel('Count')
+    plt.xticks(
+        ticks=range(0, 12),  # Ensure ticks align with actual data indices
+        labels=['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+    )
+    plt.legend(title='Egg Grade')
+    st.pyplot(plt)
 
-# Display the plot in Streamlit
-st.pyplot(plt)
+def main():
+    st.title("Egg Grade Distribution Analysis")
+
+    # Load data
+    df = load_data()
+
+    if df is not None:
+        # Show a preview of the data
+        st.subheader("Data Preview")
+        st.write(df.head())
+
+        # Show the plot
+        plot_egg_counts(df)
+
+if __name__ == "__main__":
+    main()
+
 
 
 
