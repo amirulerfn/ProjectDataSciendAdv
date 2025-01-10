@@ -9,7 +9,7 @@ st.title("Telur Kelantan Data Analysis")
 # Try to load the data
 try:
     # Load the dataset
-    df = pd.read_csv('/content/telur kelantan filtered.csv')
+    df = pd.read_csv('telur kelantan filtered.csv')
 
     # Display the first few rows of the DataFrame
     st.subheader("First few rows of the DataFrame:")
