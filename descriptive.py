@@ -62,25 +62,22 @@ except FileNotFoundError:
 except pd.errors.ParserError:
     st.error("Error: Could not parse the file. Please check the file format.")
 
-# Replace item_code with grades
-df['item_code'] = df['item_code'].replace({118: 'A', 119: 'B', 120: 'C'})
-
-# Attempt to convert 'date' column to datetime with error handling
+# Convert 'date' column to datetime with error handling
 try:
-    # Attempt to convert 'date' column with error handling and format coercion
+    # Attempt to convert 'date' column with error handling
     df['date'] = pd.to_datetime(df['date'], format='%d/%m/%Y', errors='coerce')
 
-    # Check for invalid or missing dates (NaT)
+    # Check for any rows where the conversion failed
     invalid_dates = df[df['date'].isna()]
     if not invalid_dates.empty:
         st.warning(f"Warning: {len(invalid_dates)} rows have invalid or missing dates.")
         st.write(invalid_dates)
 
-    # Optionally, drop rows with invalid dates
-    df = df.dropna(subset=['date'])
-
 except Exception as e:
     st.error(f"Error occurred during date conversion: {e}")
+
+# Replace item_code with grades
+df['item_code'] = df['item_code'].replace({118: 'A', 119: 'B', 120: 'C'})
 
 # Visualization 1: Item Counts per Premise (with premise instead of premise_code)
 grouped = df.groupby(['premise', 'item_code']).size().reset_index(name='jumlah')
