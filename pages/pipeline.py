@@ -3,7 +3,7 @@ import pandas as pd
 import joblib
 
 # Load the trained pipeline
-pipeline = joblib.load('rf_model_pipeline (1).pkl')
+pipeline = joblib.load('rf_model_pipeline (2).pkl')
 
 # Extract available options for categorical features
 preprocessor = pipeline.named_steps['preprocessor']
