@@ -144,18 +144,18 @@ monthly_egg_counts = df.groupby(['month', 'item_code'])['item_code'].count().res
 monthly_egg_counts = monthly_egg_counts.sort_values(by='month')
 
     # Create the bar plot
-    plt.figure(figsize=(12, 6))
-    sns.barplot(x='month', y='count', hue='item_code', data=monthly_egg_counts, dodge=True)
-    plt.title('Number of Eggs per Month by Grade')
-    plt.xlabel('Month')
-    plt.ylabel('Count')
-    plt.xticks(
+plt.figure(figsize=(12, 6))
+sns.barplot(x='month', y='count', hue='item_code', data=monthly_egg_counts, dodge=True)
+plt.title('Number of Eggs per Month by Grade')
+plt.xlabel('Month')
+plt.ylabel('Count')
+plt.xticks(
         ticks=range(0, 12),  # Ensure ticks align with actual data indices
         labels=['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
     )
-    plt.legend(title='Egg Grade')
-    plt.tight_layout()
-    st.pyplot(plt)
+plt.legend(title='Egg Grade')
+plt.tight_layout()
+st.pyplot(plt)
 
 except FileNotFoundError:
     st.error("Error: File not found.")
