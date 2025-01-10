@@ -146,4 +146,8 @@ plt.xlabel('Month')
 plt.ylabel('Count')
 plt.xticks(
     ticks=range(0, 12),
-    labels=['Jan', 'Feb', 'Mar', 'Apr', 
+    labels=['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+)
+plt.legend(title='Egg Grade')
+plt.tight_layout()
+plt.show()
