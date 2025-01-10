@@ -128,40 +128,37 @@ st.pyplot(plt)
 
 # Visualization 6: Number of Eggs per Month by Grade
  # Convert 'date' column to datetime objects
-df['date'] = pd.to_datetime(df['date'], format='%d/%m/%Y')
+# Convert 'date' column to datetime objects with error handling
+df['date'] = pd.to_datetime(df['date'], format='%d/%m/%Y', errors='coerce')
 
-    # Extract month and year
+# Check for any missing or invalid dates after conversion
+invalid_dates = df['date'].isnull().sum()
+if invalid_dates > 0:
+    st.warning(f"There are {invalid_dates} invalid or missing dates.")
+
+# Extract month and year
 df['month'] = df['date'].dt.month
 df['year'] = df['date'].dt.year
 
-    # Replace item_code with grades
+# Replace item_code with grades
 df['item_code'] = df['item_code'].replace({118: 'A', 119: 'B', 120: 'C'})
 
-    # Group data by month and item_code, then count
+# Group data by month and item_code, then count
 monthly_egg_counts = df.groupby(['month', 'item_code'])['item_code'].count().reset_index(name='count')
 
-    # Sort the data by month
+# Sort the data by month
 monthly_egg_counts = monthly_egg_counts.sort_values(by='month')
 
-    # Create the bar plot
+# Display a bar plot
+st.subheader('Number of Eggs per Month by Grade')
 plt.figure(figsize=(12, 6))
 sns.barplot(x='month', y='count', hue='item_code', data=monthly_egg_counts, dodge=True)
 plt.title('Number of Eggs per Month by Grade')
 plt.xlabel('Month')
 plt.ylabel('Count')
 plt.xticks(
-        ticks=range(0, 12),  # Ensure ticks align with actual data indices
-        labels=['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-    )
+    ticks=range(0, 12),  # Ensure ticks align with actual data indices
+    labels=['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+)
 plt.legend(title='Egg Grade')
-plt.tight_layout()
-st.pyplot(plt)
-
-except FileNotFoundError:
-    st.error("Error: File not found.")
-except pd.errors.ParserError:
-    st.error("Error: Could not parse the file. Please check the file format.")
-except KeyError as e:
-    st.error(f"Error: Column '{e}' not found in the CSV file.")
-except Exception as e:
-    st.error(f"An unexpected error occurred: {e}")
+st.pyplot()  # This will display the plot in the Streamlit app
