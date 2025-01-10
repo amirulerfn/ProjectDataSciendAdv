@@ -1,7 +1,7 @@
 import pandas as pd
 
 try:
-  df = pd.read_csv('/content/telur kelantan filtered.csv')
+  df = pd.read_csv(telur kelantan filtered.csv)
   print(df)
 except FileNotFoundError:
   print("Error: File not found.")
