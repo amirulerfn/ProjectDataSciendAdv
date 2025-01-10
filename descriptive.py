@@ -140,67 +140,64 @@ st.title('Egg Grade Analysis per Month')
 # File uploader widget to upload CSV file
 
 
-if uploaded_file is not None:
-    try:
-        # Read the uploaded CSV file
-        df = pd.read_csv(uploaded_file)
 
-        # Display the first few rows of the dataframe
-        st.subheader('Data Preview')
-        st.write(df.head())
 
-        # Convert 'date' column to datetime objects with error handling
-        df['date'] = pd.to_datetime(df['date'], format='%d/%m/%Y', errors='coerce')
+# Display the first few rows of the dataframe
+st.subheader('Data Preview')
+st.write(df.head())
 
-        # Check for any missing or invalid dates after conversion
-        invalid_dates = df['date'].isnull().sum()
-        if invalid_dates > 0:
-            st.warning(f"There are {invalid_dates} invalid or missing dates.")
+# Convert 'date' column to datetime objects with error handling
+df['date'] = pd.to_datetime(df['date'], format='%d/%m/%Y', errors='coerce')
 
-            # Optionally show rows with invalid dates
-            invalid_rows = df[df['date'].isnull()]
-            st.subheader("Invalid Date Entries")
-            st.write(invalid_rows)
+# Check for any missing or invalid dates after conversion
+invalid_dates = df['date'].isnull().sum()
+if invalid_dates > 0:
+    st.warning(f"There are {invalid_dates} invalid or missing dates.")
 
-            # Optionally, drop rows with invalid dates
-            df = df.dropna(subset=['date'])
+    # Optionally show rows with invalid dates
+    invalid_rows = df[df['date'].isnull()]
+    st.subheader("Invalid Date Entries")
+    st.write(invalid_rows)
 
-            # Or replace invalid dates with a default value
-            # df['date'] = df['date'].fillna(pd.to_datetime('2022-01-01'))
+    # Optionally, drop rows with invalid dates
+    df = df.dropna(subset=['date'])
 
-        # Extract month and year
-        df['month'] = df['date'].dt.month
-        df['year'] = df['date'].dt.year
+    # Or replace invalid dates with a default value
+    # df['date'] = df['date'].fillna(pd.to_datetime('2022-01-01'))
 
-        # Replace item_code with grades
-        df['item_code'] = df['item_code'].replace({118: 'A', 119: 'B', 120: 'C'})
+# Extract month and year
+df['month'] = df['date'].dt.month
+df['year'] = df['date'].dt.year
 
-        # Group data by month and item_code, then count
-        monthly_egg_counts = df.groupby(['month', 'item_code'])['item_code'].count().reset_index(name='count')
+# Replace item_code with grades
+df['item_code'] = df['item_code'].replace({118: 'A', 119: 'B', 120: 'C'})
 
-        # Sort the data by month
-        monthly_egg_counts = monthly_egg_counts.sort_values(by='month')
+# Group data by month and item_code, then count
+monthly_egg_counts = df.groupby(['month', 'item_code'])['item_code'].count().reset_index(name='count')
 
-        # Create a figure and axis for the plot
-        fig, ax = plt.subplots(figsize=(12, 6))
+# Sort the data by month
+monthly_egg_counts = monthly_egg_counts.sort_values(by='month')
 
-        # Create the bar plot
-        sns.barplot(x='month', y='count', hue='item_code', data=monthly_egg_counts, dodge=True, ax=ax)
-        ax.set_title('Number of Eggs per Month by Grade')
-        ax.set_xlabel('Month')
-        ax.set_ylabel('Count')
-        ax.set_xticks(range(0, 12))  # Ensure ticks align with actual data indices
-        ax.set_xticklabels(['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'])
-        ax.legend(title='Egg Grade')
+# Create a figure and axis for the plot
+fig, ax = plt.subplots(figsize=(12, 6))
 
-        # Display the plot in the Streamlit app
-        st.pyplot(fig)  # Pass the 'fig' explicitly
+# Create the bar plot
+sns.barplot(x='month', y='count', hue='item_code', data=monthly_egg_counts, dodge=True, ax=ax)
+ax.set_title('Number of Eggs per Month by Grade')
+ax.set_xlabel('Month')
+ax.set_ylabel('Count')
+ax.set_xticks(range(0, 12))  # Ensure ticks align with actual data indices
+ax.set_xticklabels(['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'])
+ax.legend(title='Egg Grade')
 
-    except FileNotFoundError:
-        st.error("Error: File not found.")
-    except pd.errors.ParserError:
-        st.error("Error: Could not parse the file. Please check the file format.")
-    except KeyError as e:
+# Display the plot in the Streamlit app
+st.pyplot(fig)  # Pass the 'fig' explicitly
+
+except FileNotFoundError:
+st.error("Error: File not found.")
+except pd.errors.ParserError:
+st.error("Error: Could not parse the file. Please check the file format.")
+except KeyError as e:
         st.error(f"Error: Column '{e}' not found in the CSV file.")
     except Exception as e:
         st.error(f"An unexpected error occurred: {e}")
