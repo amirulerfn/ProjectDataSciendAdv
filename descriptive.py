@@ -129,22 +129,38 @@ st.pyplot(plt)
 # Visualization 6: Number of Eggs per Month by Grade
  # Convert 'date' column to datetime objects
 # Convert 'date' column to datetime objects with error handling
-import streamlit as st
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
+import streamlit as st
 
 # Streamlit app title
 st.title('Egg Counts per Month by Grade')
 
 # Upload CSV file
-uploaded_file = st.file_uploader("telur kelantan filtered.csv", type="csv")
+uploaded_file = st.file_uploader("Choose a CSV file", type="csv")
 if uploaded_file is not None:
     # Load the data into a DataFrame
     df = pd.read_csv(uploaded_file)
 
-    # Convert 'date' column to datetime objects
-    df['date'] = pd.to_datetime(df['date'], format='%d/%m/%Y')
+    # Inspect the date column to ensure correct format and identify any issues
+    st.write("Preview of date column:")
+    st.write(df['date'].head())  # Display first few rows of the date column
+    st.write("Unique date values:")
+    st.write(df['date'].unique())  # Show unique date values
+
+    # Clean the 'date' column by stripping any leading/trailing spaces
+    df['date'] = df['date'].str.strip()
+
+    # Convert 'date' column to datetime objects with error handling
+    # Using errors='coerce' to handle invalid dates gracefully by converting them to NaT
+    df['date'] = pd.to_datetime(df['date'], format='%d/%m/%Y', errors='coerce')
+
+    # Check for any invalid date entries
+    invalid_dates = df[df['date'].isna()]
+    if not invalid_dates.empty:
+        st.write("Rows with invalid dates:")
+        st.write(invalid_dates)  # Display rows where 'date' is invalid
 
     # Extract month and year
     df['month'] = df['date'].dt.month
@@ -173,6 +189,7 @@ if uploaded_file is not None:
 
     # Display the plot in Streamlit
     st.pyplot(plt)
+
 
 
 
