@@ -130,6 +130,8 @@ st.pyplot(plt)
  # Convert 'date' column to datetime objects
 # Convert 'date' column to datetime objects with error handling
 # Extract month and year
+df['date'] = df['date'].str.strip()
+df['date'] = pd.to_datetime(df['date'], format='%m/%d/%Y', errors='coerce')
 df['month'] = df['date'].dt.month
 df['year'] = df['date'].dt.year
 
