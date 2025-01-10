@@ -130,7 +130,7 @@ st.pyplot(plt)
  # Convert 'date' column to datetime objects
 # Convert 'date' column to datetime objects with error handling
 # Extract month and year
-df = pd.read_csv(file_path)
+df = pd.read_csv('telur kelantan filtered.csv')
 # Inspect the date column to ensure correct format and identify any issues
 st.write("Preview of date column:")
 st.write(df['date'].head())  # Display first few rows of the date column
