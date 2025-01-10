@@ -130,6 +130,12 @@ st.pyplot(plt)
  # Convert 'date' column to datetime objects
 # Convert 'date' column to datetime objects with error handling
 # Extract month and year
+df = pd.read_csv(file_path)
+# Inspect the date column to ensure correct format and identify any issues
+st.write("Preview of date column:")
+st.write(df['date'].head())  # Display first few rows of the date column
+st.write("Unique date values:")
+st.write(df['date'].unique())  # Show unique date values
 df['date'] = df['date'].str.strip()
 df['date'] = pd.to_datetime(df['date'], format='%m/%d/%Y', errors='coerce')
 df['month'] = df['date'].dt.month
