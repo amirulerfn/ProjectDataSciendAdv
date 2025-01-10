@@ -155,7 +155,7 @@ if uploaded_file is not None:
 
     # Convert 'date' column to datetime objects with error handling
     # Using errors='coerce' to handle invalid dates gracefully by converting them to NaT
-    df['date'] = pd.to_datetime(df['date'], format='%d/%m/%Y', errors='coerce')
+    df['date'] = pd.to_datetime(df['date'], format='%Y/%m/%d', errors='coerce')
 
     # Check for any invalid date entries
     invalid_dates = df[df['date'].isna()]
