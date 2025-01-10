@@ -149,16 +149,17 @@ monthly_egg_counts = df.groupby(['month', 'item_code'])['item_code'].count().res
 # Sort the data by month
 monthly_egg_counts = monthly_egg_counts.sort_values(by='month')
 
-# Display a bar plot
-st.subheader('Number of Eggs per Month by Grade')
-plt.figure(figsize=(12, 6))
-sns.barplot(x='month', y='count', hue='item_code', data=monthly_egg_counts, dodge=True)
-plt.title('Number of Eggs per Month by Grade')
-plt.xlabel('Month')
-plt.ylabel('Count')
-plt.xticks(
-    ticks=range(0, 12),  # Ensure ticks align with actual data indices
-    labels=['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-)
-plt.legend(title='Egg Grade')
-st.pyplot()  # This will display the plot in the Streamlit app
+# Create a figure and axis for the plot
+fig, ax = plt.subplots(figsize=(12, 6))
+
+# Create the bar plot
+sns.barplot(x='month', y='count', hue='item_code', data=monthly_egg_counts, dodge=True, ax=ax)
+ax.set_title('Number of Eggs per Month by Grade')
+ax.set_xlabel('Month')
+ax.set_ylabel('Count')
+ax.set_xticks(range(0, 12))  # Ensure ticks align with actual data indices
+ax.set_xticklabels(['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'])
+ax.legend(title='Egg Grade')
+
+# Display the plot in the Streamlit app
+st.pyplot(fig)  # Pass the 'fig' explicitly
