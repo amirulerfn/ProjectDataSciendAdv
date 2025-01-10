@@ -127,7 +127,7 @@ plt.tight_layout()
 st.pyplot(plt)
 
 # Visualization 6: Number of Eggs per Month by Grade
-# Convert 'date' column to datetime objects
+ # Convert 'date' column to datetime objects
     df['date'] = pd.to_datetime(df['date'], format='%d/%m/%Y')
 
     # Extract month and year
