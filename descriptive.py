@@ -128,20 +128,20 @@ st.pyplot(plt)
 
 # Visualization 6: Number of Eggs per Month by Grade
  # Convert 'date' column to datetime objects
-    df['date'] = pd.to_datetime(df['date'], format='%d/%m/%Y')
+df['date'] = pd.to_datetime(df['date'], format='%d/%m/%Y')
 
     # Extract month and year
-    df['month'] = df['date'].dt.month
-    df['year'] = df['date'].dt.year
+df['month'] = df['date'].dt.month
+df['year'] = df['date'].dt.year
 
     # Replace item_code with grades
-    df['item_code'] = df['item_code'].replace({118: 'A', 119: 'B', 120: 'C'})
+df['item_code'] = df['item_code'].replace({118: 'A', 119: 'B', 120: 'C'})
 
     # Group data by month and item_code, then count
-    monthly_egg_counts = df.groupby(['month', 'item_code'])['item_code'].count().reset_index(name='count')
+monthly_egg_counts = df.groupby(['month', 'item_code'])['item_code'].count().reset_index(name='count')
 
     # Sort the data by month
-    monthly_egg_counts = monthly_egg_counts.sort_values(by='month')
+monthly_egg_counts = monthly_egg_counts.sort_values(by='month')
 
     # Create the bar plot
     plt.figure(figsize=(12, 6))
