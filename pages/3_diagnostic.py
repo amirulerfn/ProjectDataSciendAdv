@@ -3,7 +3,7 @@ import pandas as pd
 import plotly.express as px
 
 # Load the datasets
-income_state = pd.read_csv('/content/hh_income_state.csv')
+income_state = pd.read_csv('hh_income_state.csv')
 population_state = pd.read_csv('/content/population_state.csv')
 
 # Set up the page title and layout
