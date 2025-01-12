@@ -1,204 +1,122 @@
 import pandas as pd
+import streamlit as st
+import plotly.express as px  # For interactive visualizations
 import matplotlib.pyplot as plt
 import seaborn as sns
-import streamlit as st
 
 # Title of the Streamlit app
-st.title("Telur Kelantan Data Analysis")
+st.title("Egg Grade Analysis 📊")
 
-# Try to load the data
-try:
-    # Load the dataset
-    df = pd.read_csv('telur kelantan filtered.csv')
-
-    # Display the first few rows of the DataFrame
-    st.subheader("First few rows of the DataFrame:")
-    st.write(df.head())
-
-    # Display basic statistics about the DataFrame
-    st.subheader("Summary statistics:")
-    st.write(df.describe())
-
-    # Total premises
-    st.subheader("Total Premises:")
-    st.write(len(df))
-
-    # Premises count
-    premise_counts = df.groupby('premise_code').size().reset_index(name='total')
-    st.subheader("Premise Counts:")
-    st.write(premise_counts)
-
-    # Visualize premise counts using Streamlit's chart
-    st.subheader("Distribution of Premises:")
-    plt.figure(figsize=(10, 6))
-    sns.countplot(x='premise_code', data=df)
-    plt.title('Distribution of Premises')
-    plt.xlabel('Premise Code')
-    plt.ylabel('Count')
-    plt.xticks(rotation=45, ha='right')  # Rotate x-axis labels for better readability
-    plt.tight_layout()
-    st.pyplot(plt)
-
-    # Grouped data
-    grouped = df.groupby(['premise_code', 'item_code']).size().reset_index(name='jumlah')
-    result = pd.merge(grouped, df[['premise_code', 'premise', 'premise_type', 'district']], on='premise_code', how='left')
-    result = result.drop_duplicates(subset=['premise_code', 'item_code'])
-    st.subheader("Grouped data with premise details:")
-    st.write(result)
-
-    # Visualization of item counts per premise using Streamlit's chart
-    st.subheader("Item Counts per Premise:")
-    plt.figure(figsize=(12, 6))
-    sns.barplot(x='premise_code', y='jumlah', hue='item_code', data=result)
-    plt.title('Item Counts per Premise')
-    plt.xlabel('Premise Code')
-    plt.ylabel('Jumlah')
-    plt.xticks(rotation=45, ha='right')
-    plt.tight_layout()
-    st.pyplot(plt)
-
-except FileNotFoundError:
-    st.error("Error: File not found.")
-except pd.errors.ParserError:
-    st.error("Error: Could not parse the file. Please check the file format.")
-
-# Replace item_code with grades
-df['item_code'] = df['item_code'].replace({118: 'A', 119: 'B', 120: 'C'})
-
-# Visualization 1: Item Counts per Premise (with premise instead of premise_code)
-grouped = df.groupby(['premise', 'item_code']).size().reset_index(name='jumlah')
-result = pd.merge(grouped, df[['premise', 'premise_type', 'district']], on='premise', how='left')
-result = result.drop_duplicates(subset=['premise', 'item_code'])
-
-st.subheader("Item Counts per Premise (by Grade):")
-plt.figure(figsize=(12, 6))
-sns.barplot(x='premise', y='jumlah', hue='item_code', data=result)
-plt.title('Item Counts per Premise')
-plt.xlabel('Premise')
-plt.ylabel('Jumlah')
-plt.xticks(rotation=45, ha='right')
-plt.tight_layout()
-st.pyplot(plt)
-
-# Visualization 2: Item Grade Counts per District
-grouped_district = df.groupby(['district', 'item_code'])['item_code'].count().reset_index(name='count')
-
-st.subheader("Item Grade Counts per District:")
-plt.figure(figsize=(12, 6))
-sns.barplot(x='district', y='count', hue='item_code', data=grouped_district)
-plt.title('Item Grade Counts per District')
-plt.xlabel('District')
-plt.ylabel('Count')
-plt.xticks(rotation=45, ha='right')
-plt.tight_layout()
-st.pyplot(plt)
-
-# Visualization 3: Distribution of Egg Grades (Pie Chart)
-grade_counts = df['item_code'].value_counts()
-
-st.subheader("Distribution of Egg Grades:")
-plt.figure(figsize=(8, 8))
-plt.pie(grade_counts, labels=grade_counts.index, autopct='%1.1f%%', startangle=90)
-plt.title('Distribution of Egg Grades')
-st.pyplot(plt)
-
-# Visualization 4: Box plot of 'jumlah' (counts) per district
-st.subheader("Distribution of Item Counts per District:")
-plt.figure(figsize=(10, 6))
-sns.boxplot(x='district', y='jumlah', data=result)
-plt.title('Distribution of Item Counts per District')
-plt.xlabel('District')
-plt.ylabel('Jumlah')
-plt.xticks(rotation=45, ha='right')
-plt.tight_layout()
-st.pyplot(plt)
-
-# Visualization 5: Average Price per Grade at Each Premise
-grouped_price = df.groupby(['premise', 'item_code'])['price'].mean().reset_index()
-
-st.subheader("Average Egg Price per Grade at Each Premise:")
-plt.figure(figsize=(16, 8))
-sns.barplot(x='premise', y='price', hue='item_code', data=grouped_price)
-plt.title('Average Egg Price per Grade at Each Premise')
-plt.xlabel('Premise')
-plt.ylabel('Average Price')
-plt.xticks(rotation=45, ha='right')
-plt.tight_layout()
-st.pyplot(plt)
-
-# Visualization 6: Number of Eggs per Month by Grade
-import streamlit as st
-import pandas as pd
-import seaborn as sns
-import matplotlib.pyplot as plt
-
+# Function to load and preprocess the dataset
+@st.cache
 def load_data():
     try:
-        # Replace with the actual file path or use a file uploader in Streamlit
-        df = pd.read_csv('telur kelantan filtered.csv')
-
-        # Convert 'date' column to datetime objects
+        df = pd.read_csv("telur kelantan filtered.csv")
         df['date'] = pd.to_datetime(df['date'], format='%m/%d/%Y')
-
-        # Extract month and year
         df['month'] = df['date'].dt.month
         df['year'] = df['date'].dt.year
-
-        # Replace item_code with grades
         df['item_code'] = df['item_code'].replace({118: 'A', 119: 'B', 120: 'C'})
-
         return df
-    except FileNotFoundError:
-        st.error("Error: File not found.")
-    except pd.errors.ParserError:
-        st.error("Error: Could not parse the file. Please check the file format.")
-    except KeyError as e:
-        st.error(f"Error: Column '{e}' not found in the CSV file.")
     except Exception as e:
-        st.error(f"An unexpected error occurred: {e}")
-    return None
+        st.error(f"Error loading data: {e}")
+        return None
 
-def plot_egg_counts(df):
-    # Group data by month and item_code, then count
-    monthly_egg_counts = df.groupby(['month', 'item_code'])['item_code'].count().reset_index(name='count')
+# Load data
+df = load_data()
 
-    # Sort the data by month
-    monthly_egg_counts = monthly_egg_counts.sort_values(by='month')
+if df is not None:
+    # Display a preview of the dataset
+    st.subheader("Dataset Preview")
+    st.write(df.head())
 
-    # Create the bar plot
-    plt.figure(figsize=(12, 6))
-    sns.barplot(x='month', y='count', hue='item_code', data=monthly_egg_counts, dodge=True)
-    plt.title('Number of Eggs per Month by Grade')
-    plt.xlabel('Month')
-    plt.ylabel('Count')
-    plt.xticks(
-        ticks=range(0, 12),  # Ensure ticks align with actual data indices
-        labels=['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+    # Visualization 1: Premise distribution with Plotly
+    st.subheader("Premise Distribution")
+    premise_counts = df['premise_code'].value_counts().reset_index()
+    premise_counts.columns = ['Premise Code', 'Count']
+    fig_premise = px.bar(
+        premise_counts, 
+        x='Premise Code', 
+        y='Count', 
+        color='Count', 
+        title="Distribution of Premises", 
+        labels={'Count': 'Number of Records'}
     )
-    plt.legend(title='Egg Grade')
-    st.pyplot(plt)
+    st.plotly_chart(fig_premise)
 
-def main():
-    st.title("Egg Grade Distribution Analysis")
+    # Visualization 2: Item counts per premise
+    grouped = df.groupby(['premise', 'item_code']).size().reset_index(name='count')
+    fig_items = px.bar(
+        grouped, 
+        x='premise', 
+        y='count', 
+        color='item_code', 
+        title="Item Counts per Premise (by Grade)",
+        labels={'count': 'Count', 'premise': 'Premise', 'item_code': 'Egg Grade'},
+        barmode='group'
+    )
+    st.plotly_chart(fig_items)
 
-    # Load data
-    df = load_data()
+    # Visualization 3: Grade distribution with a pie chart
+    st.subheader("Distribution of Egg Grades")
+    grade_counts = df['item_code'].value_counts().reset_index()
+    grade_counts.columns = ['Grade', 'Count']
+    fig_grade = px.pie(
+        grade_counts, 
+        values='Count', 
+        names='Grade', 
+        title="Egg Grade Distribution", 
+        color_discrete_sequence=px.colors.sequential.RdBu
+    )
+    st.plotly_chart(fig_grade)
 
-    if df is not None:
-        # Show a preview of the data
-        st.subheader("Data Preview")
-        st.write(df.head())
+    # Visualization 4: Item counts per district
+    grouped_district = df.groupby(['district', 'item_code'])['item_code'].count().reset_index(name='count')
+    fig_district = px.bar(
+        grouped_district,
+        x='district',
+        y='count',
+        color='item_code',
+        title="Item Grade Counts per District",
+        labels={'district': 'District', 'count': 'Count', 'item_code': 'Egg Grade'},
+        barmode='stack'
+    )
+    st.plotly_chart(fig_district)
 
-        # Show the plot
-        plot_egg_counts(df)
+    # Visualization 5: Monthly trends of egg counts
+    monthly_counts = df.groupby(['month', 'item_code'])['item_code'].count().reset_index(name='count')
+    fig_monthly = px.line(
+        monthly_counts, 
+        x='month', 
+        y='count', 
+        color='item_code', 
+        title="Monthly Trends of Egg Counts by Grade",
+        labels={'month': 'Month', 'count': 'Count', 'item_code': 'Egg Grade'}
+    )
+    st.plotly_chart(fig_monthly)
 
-if __name__ == "__main__":
-    main()
+    # Visualization 6: Average price per grade by premise
+    avg_price = df.groupby(['premise', 'item_code'])['price'].mean().reset_index()
+    fig_avg_price = px.bar(
+        avg_price, 
+        x='premise', 
+        y='price', 
+        color='item_code', 
+        title="Average Price per Grade at Each Premise",
+        labels={'premise': 'Premise', 'price': 'Average Price', 'item_code': 'Egg Grade'},
+        barmode='group'
+    )
+    st.plotly_chart(fig_avg_price)
 
-
-
-
-
-
-
-
+    # Extra Visualization: Boxplot for price distribution by grade
+    st.subheader("Price Distribution by Grade")
+    fig_box = px.box(
+        df, 
+        x='item_code', 
+        y='price', 
+        color='item_code', 
+        title="Price Distribution per Grade",
+        labels={'item_code': 'Egg Grade', 'price': 'Price'},
+    )
+    st.plotly_chart(fig_box)
+else:
+    st.error("Unable to load data. Please check the file path or data format.")
