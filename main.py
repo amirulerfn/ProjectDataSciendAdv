@@ -15,5 +15,4 @@ st.markdown("""
     Let’s crack the numbers and uncover the egg market's future in Kelantan! 🍳📊
 """)
 
-# Add an image to make the page more interesting
-st.image("path_to_your_image.jpg", caption="Eggs at the market in Kelantan", use_column_width=True)
+
