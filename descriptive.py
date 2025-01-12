@@ -25,24 +25,31 @@ def load_data():
 # Load data
 df = load_data()
 
-if df is not None:
-    # Display a preview of the dataset
-    st.subheader("Dataset Preview")
-    st.write(df.head())
+# Count premises per district
+district_premise_counts = df.groupby('district')['premise'].nunique().reset_index()
+district_premise_counts.rename(columns={'premise': 'premise_count'}, inplace=True)
 
-    # Visualization 1: Premise distribution with Plotly
-    st.subheader("Premise Distribution")
-    premise_counts = df['premise_code'].value_counts().reset_index()
-    premise_counts.columns = ['Premise Code', 'Count']
-    fig_premise = px.bar(
-        premise_counts, 
-        x='Premise Code', 
-        y='Count', 
-        color='Count', 
-        title="Distribution of Premises", 
-        labels={'Count': 'Number of Records'}
-    )
-    st.plotly_chart(fig_premise)
+# Sort the data by premise count for better visualization
+district_premise_counts = district_premise_counts.sort_values(by='premise_count', ascending=False)
+
+# Create the distribution plot
+plt.figure(figsize=(12, 6))
+sns.barplot(
+    x='district', 
+    y='premise_count', 
+    data=district_premise_counts, 
+    palette="viridis"
+)
+plt.title('Distribution of Premises per District', fontsize=16, fontweight='bold')
+plt.xlabel('District', fontsize=14)
+plt.ylabel('Number of Premises', fontsize=14)
+plt.xticks(rotation=45, ha='right', fontsize=12)
+plt.yticks(fontsize=12)
+plt.grid(axis='y', linestyle='--', alpha=0.7)
+plt.tight_layout()
+
+    # Display the plot
+    plt.show()
 
     # Visualization 2: Item counts per premise
     grouped = df.groupby(['premise', 'item_code']).size().reset_index(name='count')
