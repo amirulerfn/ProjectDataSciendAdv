@@ -108,24 +108,39 @@ if df is not None:
     )
     st.plotly_chart(fig_district)
 
-    # Visualization 5: Monthly trends of egg counts
-   # Visualization 5: Monthly trends of egg counts (Bar chart version)
+  # Visualization 5: Monthly trends of egg counts (Styled like other graphs)
     monthly_counts = df.groupby(['month', 'item_code'])['item_code'].count().reset_index(name='count')
     
-    # Create the bar chart
-    fig_monthly = px.bar(
-        monthly_counts, 
-        x='month', 
-        y='count', 
-        color='item_code', 
-        title="Monthly Trends of Egg Counts by Grade",
-        labels={'month': 'Month', 'count': 'Count', 'item_code': 'Egg Grade'},
-        barmode='group',  # Grouped bars for each month and egg grade
-        color_discrete_sequence=px.colors.qualitative.Set3  # Color scheme for the grades
-    )
+    # Create the bar plot with custom styling
+    plt.figure(figsize=(12, 6))
     
-    # Display the plot
-    st.plotly_chart(fig_monthly)
+    # Custom color palette
+    palette = sns.color_palette("coolwarm", as_cmap=True)
+    ax = sns.barplot(x='month', y='count', hue='item_code', data=monthly_counts, dodge=True, palette=palette)
+    
+    # Add titles and labels
+    plt.title('Monthly Trends of Egg Counts by Grade', fontsize=18, fontweight='bold', color='darkblue')
+    plt.xlabel('Month', fontsize=14, color='darkred')
+    plt.ylabel('Count', fontsize=14, color='darkred')
+    
+    # Adjust tick labels for readability and styling
+    plt.xticks(
+        ticks=range(0, 12),  # Ensure ticks align with actual data indices
+        labels=['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+        fontsize=12, fontweight='light', color='darkgreen'
+    )
+    plt.yticks(fontsize=12, fontweight='light', color='darkgreen')
+    
+    # Add legend and gridlines
+    plt.legend(title='Egg Grade', fontsize=12)
+    ax.grid(True, axis='y', linestyle='--', alpha=0.7)
+    
+    # Adjust layout for better spacing
+    plt.tight_layout()
+
+# Display the plot with Streamlit's interactive features
+    st.pyplot(plt)
+
 
 
     # Visualization 6: Average price per grade by premise
