@@ -37,8 +37,8 @@ if df is not None:
     # Create the distribution plot with unique styling
     plt.figure(figsize=(12, 6))
 
-    # Customizing the plot with a color palette and adding a gradient
-    palette = sns.color_palette("coolwarm", as_cmap=True)
+    # Using a named color palette instead of the colormap (cmap)
+    palette = "coolwarm"  # Use 'coolwarm' directly as a string
     ax = sns.barplot(x='district', y='premise_count', data=district_premise_counts, palette=palette)
     
     # Adding custom titles and labels
@@ -85,7 +85,7 @@ if df is not None:
     )
     st.plotly_chart(fig_grade)
 
-    # Visualization 4: Item counts per district (consolidated)
+    # Visualization 4: Item counts per district
     grouped_district = df.groupby(['district', 'item_code'])['item_code'].count().reset_index(name='count')
     fig_district = px.bar(
         grouped_district,
