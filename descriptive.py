@@ -8,7 +8,8 @@ import seaborn as sns
 st.title("Egg Grade Analysis 📊")
 
 # Function to load and preprocess the dataset
-@st.cache
+
+@st.cache_data
 def load_data():
     try:
         df = pd.read_csv("telur kelantan filtered.csv")
