@@ -26,31 +26,6 @@ def load_data():
         st.error(f"Error loading data: {e}")
         return None
 
-# Function to plot egg counts by month
-def plot_egg_counts(df):
-    # Group data by month and item_code, then count
-    monthly_egg_counts = df.groupby(['month', 'item_code'])['item_code'].count().reset_index(name='count')
-
-    # Sort the data by month
-    monthly_egg_counts = monthly_egg_counts.sort_values(by='month')
-
-    # Create the bar plot
-    plt.figure(figsize=(12, 6))
-    sns.barplot(x='month', y='count', hue='item_code', data=monthly_egg_counts, dodge=True)
-    plt.title('Number of Eggs per Month by Grade', fontsize=16, fontweight='bold')
-    plt.xlabel('Month', fontsize=14)
-    plt.ylabel('Count', fontsize=14)
-    plt.xticks(
-        ticks=range(0, 12),  # Ensure ticks align with actual data indices
-        labels=['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-        fontsize=12, fontweight='light'
-    )
-    plt.legend(title='Egg Grade', fontsize=12)
-    plt.tight_layout()
-
-    # Display the plot with Streamlit's interactive features
-    st.pyplot(plt)
-
 # Load the data
 df = load_data()
 
@@ -108,44 +83,47 @@ if df is not None:
     )
     st.plotly_chart(fig_district)
 
-  # Visualization 5: Monthly trends of egg counts (Styled like other graphs)
-# Visualization 5: Monthly trends of egg counts (Styled like other graphs)
+    # Visualization 5: Monthly trends of egg counts (Styled like other graphs)
     monthly_counts = df.groupby(['month', 'item_code'])['item_code'].count().reset_index(name='count')
-    
-    # Create the bar plot with custom styling
-    plt.figure(figsize=(12, 6))
-    
-    # Custom color palette (categorical)
-    palette = sns.color_palette("Set3", n_colors=len(monthly_counts['item_code'].unique()))  # Ensure enough colors
-    
-    # Create the bar plot
-    ax = sns.barplot(x='month', y='count', hue='item_code', data=monthly_counts, dodge=True, palette=palette)
-    
-    # Add titles and labels
-    plt.title('Monthly Trends of Egg Counts by Grade', fontsize=18, fontweight='bold', color='darkblue')
-    plt.xlabel('Month', fontsize=14, color='darkred')
-    plt.ylabel('Count', fontsize=14, color='darkred')
-    
-    # Adjust tick labels for readability and styling
-    plt.xticks(
-        ticks=range(0, 12),  # Ensure ticks align with actual data indices
-        labels=['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-        fontsize=12, fontweight='light', color='darkgreen'
+
+    # Create a Plotly bar chart for the monthly trends
+    fig_monthly = px.bar(
+        monthly_counts,
+        x='month',
+        y='count',
+        color='item_code',
+        title="Monthly Trends of Egg Counts by Grade",
+        labels={'month': 'Month', 'count': 'Count', 'item_code': 'Egg Grade'},
+        color_discrete_sequence=px.colors.qualitative.Set3,
+        barmode='group'  # This ensures the bars for each grade are grouped
     )
-    plt.yticks(fontsize=12, fontweight='light', color='darkgreen')
-    
-    # Add legend and gridlines
-    plt.legend(title='Egg Grade', fontsize=12)
-    ax.grid(True, axis='y', linestyle='--', alpha=0.7)
-    
-    # Adjust layout for better spacing
-    plt.tight_layout()
-    
-    # Display the plot with Streamlit's interactive features
-    st.pyplot(plt)
 
+    # Update x-axis labels to show months
+    fig_monthly.update_xaxes(
+        tickmode='array',
+        tickvals=list(range(1, 13)),  # Months from 1 to 12
+        ticktext=['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+    )
 
+    # Update layout for better styling
+    fig_monthly.update_layout(
+        title_font_size=18,
+        title_font_family='Arial',
+        title_font_color='darkblue',
+        xaxis_title='Month',
+        yaxis_title='Count',
+        xaxis_title_font_size=14,
+        yaxis_title_font_size=14,
+        xaxis_title_font_color='darkred',
+        yaxis_title_font_color='darkred',
+        legend_title='Egg Grade',
+        legend_title_font_size=12,
+        legend_font_size=12,
+        plot_bgcolor='white'
+    )
 
+    # Display the Plotly chart
+    st.plotly_chart(fig_monthly)
 
     # Visualization 6: Average price per grade by premise
     avg_price = df.groupby(['premise', 'item_code'])['price'].mean().reset_index()
@@ -171,9 +149,6 @@ if df is not None:
         labels={'item_code': 'Egg Grade', 'price': 'Price'},
     )
     st.plotly_chart(fig_box)
-
-    # Call the function to plot egg counts by month using Seaborn
-    plot_egg_counts(df)
 
 else:
     st.error("Unable to load data. Please check the file path or data format.")
