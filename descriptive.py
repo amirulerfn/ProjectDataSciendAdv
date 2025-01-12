@@ -26,16 +26,38 @@ def load_data():
         st.error(f"Error loading data: {e}")
         return None
 
-# Load the data
+# Function to plot egg counts by month
+def plot_egg_counts(df):
+    # Group data by month and item_code, then count
+    monthly_egg_counts = df.groupby(['month', 'item_code'])['item_code'].count().reset_index(name='count')
 
+    # Sort the data by month
+    monthly_egg_counts = monthly_egg_counts.sort_values(by='month')
+
+    # Create the bar plot
+    plt.figure(figsize=(12, 6))
+    sns.barplot(x='month', y='count', hue='item_code', data=monthly_egg_counts, dodge=True)
+    plt.title('Number of Eggs per Month by Grade', fontsize=16, fontweight='bold')
+    plt.xlabel('Month', fontsize=14)
+    plt.ylabel('Count', fontsize=14)
+    plt.xticks(
+        ticks=range(0, 12),  # Ensure ticks align with actual data indices
+        labels=['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+        fontsize=12, fontweight='light'
+    )
+    plt.legend(title='Egg Grade', fontsize=12)
+    plt.tight_layout()
+
+    # Display the plot with Streamlit's interactive features
+    st.pyplot(plt)
+
+# Load the data
 df = load_data()
 
 if df is not None:
-    # Count premises per district
+    # Visualization 1: Distribution of premises per district with Plotly
     district_premise_counts = df.groupby('district')['premise'].count().reset_index()
     district_premise_counts.rename(columns={'premise': 'premise_count'}, inplace=True)
-
-    # Visualization 1: Distribution of premises per district with Plotly
     fig_district_premise = px.bar(
         district_premise_counts, 
         x='district', 
@@ -46,6 +68,7 @@ if df is not None:
         color_discrete_sequence=px.colors.qualitative.Set3
     )
     st.plotly_chart(fig_district_premise)
+
     # Visualization 2: Item counts per premise
     grouped = df.groupby(['premise', 'item_code']).size().reset_index(name='count')
     fig_items = px.bar(
@@ -121,29 +144,9 @@ if df is not None:
         labels={'item_code': 'Egg Grade', 'price': 'Price'},
     )
     st.plotly_chart(fig_box)
+
+    # Call the function to plot egg counts by month using Seaborn
+    plot_egg_counts(df)
+
 else:
     st.error("Unable to load data. Please check the file path or data format.")
-# Function to plot egg counts by month
-def plot_egg_counts(df):
-    # Group data by month and item_code, then count
-    monthly_egg_counts = df.groupby(['month', 'item_code'])['item_code'].count().reset_index(name='count')
-
-    # Sort the data by month
-    monthly_egg_counts = monthly_egg_counts.sort_values(by='month')
-
-    # Create the bar plot
-    plt.figure(figsize=(12, 6))
-    sns.barplot(x='month', y='count', hue='item_code', data=monthly_egg_counts, dodge=True)
-    plt.title('Number of Eggs per Month by Grade', fontsize=16, fontweight='bold')
-    plt.xlabel('Month', fontsize=14)
-    plt.ylabel('Count', fontsize=14)
-    plt.xticks(
-        ticks=range(0, 12),  # Ensure ticks align with actual data indices
-        labels=['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-        fontsize=12, fontweight='light'
-    )
-    plt.legend(title='Egg Grade', fontsize=12)
-    plt.tight_layout()
-
-    # Display the plot with Streamlit's interactive features
-    st.pyplot(plt)
