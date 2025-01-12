@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 # Title of the Streamlit app
-st.title("Egg Grade Analysis 📊")
+st.title("Descriptive of Eggs In Kelantan 📊")
 
 # Function to load and preprocess the dataset
 @st.cache_data
