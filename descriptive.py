@@ -109,13 +109,16 @@ if df is not None:
     st.plotly_chart(fig_district)
 
   # Visualization 5: Monthly trends of egg counts (Styled like other graphs)
+# Visualization 5: Monthly trends of egg counts (Styled like other graphs)
     monthly_counts = df.groupby(['month', 'item_code'])['item_code'].count().reset_index(name='count')
     
     # Create the bar plot with custom styling
     plt.figure(figsize=(12, 6))
     
-    # Custom color palette
-    palette = sns.color_palette("coolwarm", as_cmap=True)
+    # Custom color palette (categorical)
+    palette = sns.color_palette("Set3", n_colors=len(monthly_counts['item_code'].unique()))  # Ensure enough colors
+    
+    # Create the bar plot
     ax = sns.barplot(x='month', y='count', hue='item_code', data=monthly_counts, dodge=True, palette=palette)
     
     # Add titles and labels
@@ -137,9 +140,10 @@ if df is not None:
     
     # Adjust layout for better spacing
     plt.tight_layout()
-
-# Display the plot with Streamlit's interactive features
+    
+    # Display the plot with Streamlit's interactive features
     st.pyplot(plt)
+
 
 
 
