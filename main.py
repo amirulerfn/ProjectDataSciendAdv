@@ -1,16 +1,19 @@
 import streamlit as st
 
 # Set page configuration for a more dynamic experience
-st.set_page_config(page_title="Egg Distribution Insights", layout="wide", initial_sidebar_state="expanded")
+st.set_page_config(page_title="Egg Distribution Insights - Kelantan", layout="wide", initial_sidebar_state="expanded")
 
 # Title and introduction with a welcoming, engaging tone
-st.title("🥚 Egg Distribution & Forecasting Tool")
+st.title("🥚 Kelantan Egg Distribution & Price Prediction Tool")
 st.markdown("""
-    **Welcome to the Egg Distribution & Forecasting Hub!** 🌍🐣  
-    Explore a world of data-driven insights to understand the egg distribution patterns across regions.  
-    From real-time analytics to predictive models, you’ll uncover valuable trends and forecasts.  
-    Whether you're a data enthusiast, a market analyst, or just curious about egg logistics, this tool is for you!  
-    🗺️ **Navigate through the sidebar** to discover dynamic charts, predictions, and much more.
+    **Welcome to the Kelantan Egg Market Insights & Price Prediction Hub!** 🌍🐣  
+    Dive deep into the fascinating world of egg distribution and price dynamics across Kelantan.  
+    With real-time data, detailed analytics, and predictive models, explore how supply and demand shape the local egg market.  
+    Whether you're a researcher, a farmer, or someone interested in the local economy, this tool offers valuable insights.  
+    🗺️ **Navigate through the sidebar** to explore trends, charts, and forecasts of egg prices in Kelantan.
     
-    Let's crack open the data and explore the egg industry like never before! 🍳📊
+    Let’s crack the numbers and uncover the egg market's future in Kelantan! 🍳📊
 """)
+
+# Add an image to make the page more interesting
+st.image("path_to_your_image.jpg", caption="Eggs at the market in Kelantan", use_column_width=True)
