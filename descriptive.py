@@ -109,17 +109,17 @@ if df is not None:
     fig_monthly.update_layout(
         title_font_size=18,
         title_font_family='Arial',
-        title_font_color='darkblue',
+        title_font_color='white',
         xaxis_title='Month',
         yaxis_title='Count',
         xaxis_title_font_size=14,
         yaxis_title_font_size=14,
-        xaxis_title_font_color='darkred',
-        yaxis_title_font_color='darkred',
+        xaxis_title_font_color='white',
+        yaxis_title_font_color='white',
         legend_title='Egg Grade',
         legend_title_font_size=12,
         legend_font_size=12,
-        plot_bgcolor='white'
+        plot_bgcolor='black'
     )
 
     # Display the Plotly chart
