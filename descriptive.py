@@ -109,16 +109,24 @@ if df is not None:
     st.plotly_chart(fig_district)
 
     # Visualization 5: Monthly trends of egg counts
+   # Visualization 5: Monthly trends of egg counts (Bar chart version)
     monthly_counts = df.groupby(['month', 'item_code'])['item_code'].count().reset_index(name='count')
-    fig_monthly = px.line(
+    
+    # Create the bar chart
+    fig_monthly = px.bar(
         monthly_counts, 
         x='month', 
         y='count', 
         color='item_code', 
         title="Monthly Trends of Egg Counts by Grade",
-        labels={'month': 'Month', 'count': 'Count', 'item_code': 'Egg Grade'}
+        labels={'month': 'Month', 'count': 'Count', 'item_code': 'Egg Grade'},
+        barmode='group',  # Grouped bars for each month and egg grade
+        color_discrete_sequence=px.colors.qualitative.Set3  # Color scheme for the grades
     )
+    
+    # Display the plot
     st.plotly_chart(fig_monthly)
+
 
     # Visualization 6: Average price per grade by premise
     avg_price = df.groupby(['premise', 'item_code'])['price'].mean().reset_index()
