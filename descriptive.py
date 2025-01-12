@@ -65,7 +65,6 @@ if df is not None:
         grade_counts, 
         values='Count', 
         names='Grade', 
-        title="Egg Grade Distribution", 
         color_discrete_sequence=px.colors.sequential.RdBu
     )
     st.plotly_chart(fig_grade)
@@ -145,7 +144,6 @@ if df is not None:
         x='item_code', 
         y='price', 
         color='item_code', 
-        title="Price Distribution per Grade",
         labels={'item_code': 'Egg Grade', 'price': 'Price'},
     )
     st.plotly_chart(fig_box)
