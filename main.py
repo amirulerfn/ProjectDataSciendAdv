@@ -6,6 +6,8 @@ st.set_page_config(page_title="Egg Distribution Insights - Kelantan", layout="wi
 # Title and introduction with a welcoming, engaging tone
 st.title("🥚 Kelantan Egg Distribution & Price Prediction Tool")
 st.markdown("""
+
+
     **Welcome to the Kelantan Egg Market Insights & Price Prediction Hub!** 🌍🐣  
     Dive deep into the fascinating world of egg distribution and price dynamics across Kelantan.  
     With real-time data, detailed analytics, and predictive models, explore how supply and demand shape the local egg market.  
