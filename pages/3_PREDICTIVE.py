@@ -8,7 +8,7 @@ from sklearn.ensemble import RandomForestRegressor
 from sklearn.linear_model import LinearRegression
 from sklearn.tree import DecisionTreeRegressor
 from sklearn.svm import SVR
-from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
+from sklearn.metrics import mean_absolute_error, mean_squared_error
 
 # Title of the Streamlit app
 st.title("Telur Kelantan Price Prediction 🥚")
@@ -63,25 +63,13 @@ for name, model in models.items():
     y_pred = model.predict(X_test)
     results[name] = {
         'MAE': mean_absolute_error(y_test, y_pred),
-        'MSE': mean_squared_error(y_test, y_pred),
-        'R2 Score': r2_score(y_test, y_pred)
+        'MSE': mean_squared_error(y_test, y_pred)
     }
 
 # Display results in a table
 st.subheader("Model Evaluation Results")
 results_df = pd.DataFrame(results).T
-st.write(results_df.sort_values(by='R2 Score', ascending=False))
-
-# R2 Scores Visualization
-st.subheader("R2 Scores Visualization")
-plt.figure(figsize=(10, 6))
-sns.barplot(x=results_df.index, y=results_df['R2 Score'], palette="viridis")
-plt.title('R2 Scores of Different Models', fontsize=16)
-plt.xlabel('Model', fontsize=12)
-plt.ylabel('R2 Score', fontsize=12)
-plt.xticks(rotation=45)
-plt.tight_layout()
-st.pyplot(plt)
+st.write(results_df.sort_values(by='MAE', ascending=True))
 
 # Additional Visualization: Feature Importance
 if st.checkbox("Show feature importance for Random Forest"):
