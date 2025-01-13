@@ -13,6 +13,12 @@ categories = one_hot_encoder.categories_
 # Streamlit app
 st.title("Price Prediction App")
 
+# Info about item codes
+st.info("Item Codes represent different grades of eggs:\n"
+        "- 118: TELUR AYAM GRED A\n"
+        "- 119: TELUR AYAM GRED B\n"
+        "- 120: TELUR AYAM GRED C")
+
 # Input fields for categorical features
 item_code = st.selectbox("Select Item Code", categories[0])  # Options for item_code
 premise_type = st.selectbox("Select Premise Type", categories[1])  # Options for premise_type
@@ -34,6 +40,6 @@ if st.button("Predict"):
     try:
         # Pass raw input to the pipeline
         prediction = pipeline.predict(input_data)[0]
-        st.success(f"Predicted Price: {prediction:.2f}")
+        st.success(f"Predicted Price: RM{prediction:.2f}")
     except Exception as e:
-        st.error(f"An error occurred during prediction: {e}")
+        st.error(f"An error occurred during prediction: {e}")
