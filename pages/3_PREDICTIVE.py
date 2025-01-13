@@ -70,6 +70,10 @@ for name, model in models.items():
 # Convert results to a DataFrame
 results_df = pd.DataFrame(results)
 
+# Display MAE and MSE in a table
+st.subheader("Model Evaluation Results (MAE and MSE)")
+st.write(results_df)
+
 # Visualization: MAE and MSE using Plotly
 st.subheader("Model Evaluation by Graph")
 
@@ -104,6 +108,7 @@ fig.update_layout(
 
 st.plotly_chart(fig, use_container_width=True)
 
+# Feature Importance Visualization
 if st.checkbox("Show feature importance for models"):
     # Dropdown for model selection
     selected_model = st.selectbox(
@@ -137,4 +142,3 @@ if st.checkbox("Show feature importance for models"):
         st.plotly_chart(fig_features, use_container_width=True)
     else:
         st.write(f"{selected_model} does not support feature importance.")
-
