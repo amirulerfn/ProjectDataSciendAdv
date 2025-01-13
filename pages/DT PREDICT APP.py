@@ -10,11 +10,20 @@ preprocessor = pipeline.named_steps['preprocessor']
 one_hot_encoder = preprocessor.named_transformers_['cat']
 categories = one_hot_encoder.categories_
 
+# Mapping item codes to descriptions
+item_code_descriptions = {
+    "118": "TELUR AYAM GRED A",
+    "119": "TELUR AYAM GRED B",
+    "120": "TELUR AYAM GRED C"
+}
+
 # Streamlit app
 st.title("Price Prediction App")
 
 # Input fields for categorical features
 item_code = st.selectbox("Select Item Code", categories[0])  # Options for item_code
+description = item_code_descriptions.get(item_code, 'Unknown item code')
+st.write(f"Description: {description}")  # Display item description
 premise_type = st.selectbox("Select Premise Type", categories[1])  # Options for premise_type
 district = st.selectbox("Select District", categories[2])  # Options for district
 
@@ -36,4 +45,4 @@ if st.button("Predict"):
         prediction = pipeline.predict(input_data)[0]
         st.success(f"Predicted Price: RM{prediction:.2f}")
     except Exception as e:
-        st.error(f"An error occurred during prediction: {e}")
+        st.error(f"An error occurred during prediction: {e}")
