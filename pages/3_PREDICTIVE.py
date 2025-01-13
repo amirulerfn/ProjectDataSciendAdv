@@ -148,7 +148,3 @@ if st.checkbox("Show feature importance for models"):
         st.plotly_chart(fig_features, use_container_width=True)
     else:
         st.write(f"{selected_model} does not support feature importance.")
-
-
-
-
