@@ -57,50 +57,54 @@ models = {
 }
 
 # Train and evaluate models
-results = {}
+results = []
 for name, model in models.items():
     model.fit(X_train, y_train)
     y_pred = model.predict(X_test)
-    results[name] = {
+    results.append({
+        'Model': name,
         'MAE': mean_absolute_error(y_test, y_pred),
         'MSE': mean_squared_error(y_test, y_pred)
-    }
+    })
 
-# Display results in a table
-st.subheader("Model Evaluation Results")
-results_df = pd.DataFrame(results).T
-st.write(results_df.sort_values(by='MAE', ascending=True))
+# Convert results to a DataFrame
+results_df = pd.DataFrame(results)
 
 # Visualization: MAE and MSE using Plotly
-st.subheader("MAE and MSE Visualization")
+st.subheader("Model Evaluation by Graph")
 
-# Create a Plotly bar chart for MAE
-fig_mae = px.bar(
-    results_df,
-    x=results_df.index,
-    y='MAE',
-    title='Mean Absolute Error (MAE) for Each Model',
-    labels={'x': 'Model', 'MAE': 'Mean Absolute Error'},
-    color='MAE',
-    color_continuous_scale='Blues'
+# Combined MAE and MSE Visualization
+fig = go.Figure()
+
+# Add MAE trace
+fig.add_trace(go.Bar(
+    x=results_df['Model'],
+    y=results_df['MAE'],
+    name='MAE',
+    marker_color='blue'
+))
+
+# Add MSE trace
+fig.add_trace(go.Bar(
+    x=results_df['Model'],
+    y=results_df['MSE'],
+    name='MSE',
+    marker_color='orange'
+))
+
+# Update layout for the combined graph
+fig.update_layout(
+    title="Model Evaluation: MAE and MSE",
+    xaxis_title="Model",
+    yaxis_title="Error Value",
+    barmode='group',
+    legend_title="Metrics",
+    template="plotly_white"
 )
 
-# Create a Plotly bar chart for MSE
-fig_mse = px.bar(
-    results_df,
-    x=results_df.index,
-    y='MSE',
-    title='Mean Squared Error (MSE) for Each Model',
-    labels={'x': 'Model', 'MSE': 'Mean Squared Error'},
-    color='MSE',
-    color_continuous_scale='Oranges'
-)
+st.plotly_chart(fig, use_container_width=True)
 
-# Display the charts
-st.plotly_chart(fig_mae, use_container_width=True)
-st.plotly_chart(fig_mse, use_container_width=True)
-
-# Additional Visualization: Feature Importance
+# Additional Visualization: Feature Importance (Random Forest only)
 if st.checkbox("Show feature importance for Random Forest"):
     rf_model = models['Random Forest']
     feature_importances = rf_model.feature_importances_
@@ -117,10 +121,3 @@ if st.checkbox("Show feature importance for Random Forest"):
         color_continuous_scale='coolwarm'
     )
     st.plotly_chart(fig_features, use_container_width=True)
-
-# Sidebar Option for Model Selection
-st.sidebar.subheader("Model Selection")
-selected_models = st.sidebar.multiselect("Select models to display:", list(models.keys()), default=list(models.keys()))
-filtered_results_df = results_df.loc[selected_models]
-st.subheader("Filtered Model Results")
-st.write(filtered_results_df)
