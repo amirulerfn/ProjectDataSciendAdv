@@ -108,14 +108,16 @@ if st.checkbox("Show feature importance for models"):
     # Dropdown for model selection
     selected_model = st.selectbox(
         "Select a model to display feature importance:",
-        ['Random Forest', 'Decision Tree']
+        ['Random Forest', 'Decision Tree', 'Linear Regression', 'SVM']
     )
 
-    # Check if the selected model supports feature importance
+    # Define feature names
+    feature_names = ['item_code', 'month', 'premise_type', 'district']
+
+    # Feature importance logic for each model
     if selected_model in ['Random Forest', 'Decision Tree']:
         model = models[selected_model]  # Fetch the trained model
         feature_importances = model.feature_importances_  # Get feature importance
-        feature_names = ['item_code', 'month', 'premise_type', 'district']
 
         # Plotly bar chart for feature importance
         fig_features = px.bar(
@@ -126,15 +128,51 @@ if st.checkbox("Show feature importance for models"):
             labels={'x': 'Importance', 'y': 'Feature'}
         )
 
-        # Update layout for better aesthetics
+    elif selected_model == 'Linear Regression':
+        model = models[selected_model]  # Fetch the trained model
+        feature_importances = model.coef_  # Coefficients as feature importance
+
+        # Plotly bar chart for coefficients
+        fig_features = px.bar(
+            x=feature_importances,
+            y=feature_names,
+            orientation='h',
+            title=f'Feature Coefficients ({selected_model})',
+            labels={'x': 'Coefficient Value', 'y': 'Feature'},
+            color=feature_importances,
+            color_continuous_scale='viridis'
+        )
+
+    elif selected_model == 'SVM':
+        model = models[selected_model]  # Fetch the trained model
+        if hasattr(model, 'coef_'):  # Ensure it's a linear kernel
+            feature_importances = model.coef_[0]  # Extract weights for linear SVM
+
+            # Plotly bar chart for SVM weights
+            fig_features = px.bar(
+                x=feature_importances,
+                y=feature_names,
+                orientation='h',
+                title=f'Feature Weights (SVM)',
+                labels={'x': 'Weight', 'y': 'Feature'},
+                color=feature_importances,
+                color_continuous_scale='plasma'
+            )
+        else:
+            st.write("Feature importance is not available for non-linear SVM kernels.")
+            fig_features = None
+
+    else:
+        st.write(f"{selected_model} does not support feature importance.")
+        fig_features = None
+
+    # Display the chart
+    if fig_features:
         fig_features.update_layout(
             xaxis_title="Importance",
             yaxis_title="Feature",
             template="plotly_white"
         )
-
-        # Display the chart
         st.plotly_chart(fig_features, use_container_width=True)
-    else:
-        st.write(f"{selected_model} does not support feature importance.")
+
 
