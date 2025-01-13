@@ -71,6 +71,29 @@ st.subheader("Model Evaluation Results")
 results_df = pd.DataFrame(results).T
 st.write(results_df.sort_values(by='MAE', ascending=True))
 
+# Visualization: MAE and MSE
+st.subheader("MAE and MSE Visualization")
+plt.figure(figsize=(12, 6))
+
+# MAE Visualization
+plt.subplot(1, 2, 1)
+sns.barplot(x=results_df.index, y=results_df['MAE'], palette="Blues")
+plt.title('Mean Absolute Error (MAE)', fontsize=16)
+plt.xlabel('Model', fontsize=12)
+plt.ylabel('MAE', fontsize=12)
+plt.xticks(rotation=45)
+
+# MSE Visualization
+plt.subplot(1, 2, 2)
+sns.barplot(x=results_df.index, y=results_df['MSE'], palette="Oranges")
+plt.title('Mean Squared Error (MSE)', fontsize=16)
+plt.xlabel('Model', fontsize=12)
+plt.ylabel('MSE', fontsize=12)
+plt.xticks(rotation=45)
+
+plt.tight_layout()
+st.pyplot(plt)
+
 # Additional Visualization: Feature Importance
 if st.checkbox("Show feature importance for Random Forest"):
     rf_model = models['Random Forest']
