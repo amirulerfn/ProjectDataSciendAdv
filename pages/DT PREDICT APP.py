@@ -34,6 +34,6 @@ if st.button("Predict"):
     try:
         # Pass raw input to the pipeline
         prediction = pipeline.predict(input_data)[0]
-        st.success(f"Predicted Price: {prediction:.2f}")
+        st.success(f"Predicted Price: RM{prediction:.2f}")
     except Exception as e:
         st.error(f"An error occurred during prediction: {e}")
