@@ -1,67 +1,119 @@
-import streamlit as st
 import pandas as pd
+import streamlit as st
 import plotly.express as px
+import plotly.graph_objects as go
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import LabelEncoder, StandardScaler
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.linear_model import LinearRegression
+from sklearn.tree import DecisionTreeRegressor
+from sklearn.svm import SVR
+from sklearn.metrics import mean_absolute_error, mean_squared_error
 
-# Load the datasets
-income_state = pd.read_csv('hh_income_state.csv')
-population_state = pd.read_csv('population_state.csv')
+# Title of the Streamlit app
+st.title("Telur Kelantan Price Prediction 🥚")
 
-# Set up the page title and layout
-st.set_page_config(page_title="Kelantan Population and Income Insights", layout="wide")
+# Load the dataset
+df = pd.read_csv("telur kelantan filtered.csv")
 
-# Title for the app
-st.title("📊 Kelantan Population and Income Insights")
+# Display the first few rows of the dataset
+st.subheader("Dataset Preview")
+st.write(df.head())
 
-# Description of the app
-st.markdown("""
-    **Welcome to the Kelantan Population & Income Insights Dashboard!**  
-    Explore detailed analyses of Kelantan's population changes, ethnic distribution, and income trends over time.  
-    Visualize key insights from historical data, and gain valuable information for decision-making.  
-""")
+# Preprocessing
+# Convert date to datetime and extract useful features
+df['date'] = pd.to_datetime(df['date'])
+df['month'] = df['date'].dt.month
+df['day'] = df['date'].dt.day
+df['day_of_week'] = df['date'].dt.dayofweek
 
-# --- Population Over Time ---
-st.header("📈 Population of Kelantan Over Time")
-# Convert 'date' to datetime in the original DataFrame to avoid warnings
-population_state['date'] = pd.to_datetime(population_state['date'], errors='coerce')
+# Encode categorical variables
+label_encoders = {}
+for col in ['premise', 'premise_type', 'state', 'district', 'item', 'unit', 'item_group', 'item_category']:
+    le = LabelEncoder()
+    df[col] = le.fit_transform(df[col])
+    label_encoders[col] = le
 
-# Filter data for Kelantan
-kelantan_population = population_state[population_state['state'] == 'Kelantan']
+# Drop unnecessary columns
+df.drop(['date', 'address'], axis=1, inplace=True)
 
-# Plot the population of Kelantan over time using Plotly
-fig_population = px.line(kelantan_population, x=kelantan_population['date'].dt.year, y='population',
-                         title='Population of Kelantan Over Time', labels={'date': 'Year', 'population': 'Population'})
+# Split data into features and target
+X = df[['item_code', 'month', 'premise_type', 'district']] 
+y = df['price']
 
-# Show the plot
-st.plotly_chart(fig_population)
+# Standardize features
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
 
-# --- Population Ethnicity Over Time ---
-st.header("🧑‍🤝‍🧑 Ethnicity Distribution in Kelantan Over Time")
-# Group data by ethnicity and year
-ethnicity_population = kelantan_population.groupby(['ethnicity', kelantan_population['date'].dt.year])['population'].sum().reset_index()
+# Split data into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.2, random_state=42)
 
-# Plot the population ethnicity over time using Plotly
-fig_ethnicity = px.line(ethnicity_population, x='date', y='population', color='ethnicity',
-                        title='Population Ethnicity in Kelantan Over Time', labels={'date': 'Year', 'population': 'Population'})
+# Initialize models
+models = {
+    'Random Forest': RandomForestRegressor(random_state=42),
+    'Linear Regression': LinearRegression(),
+    'Decision Tree': DecisionTreeRegressor(random_state=42),
+    'SVM': SVR()
+}
 
-# Show the plot
-st.plotly_chart(fig_ethnicity)
+# Train and evaluate models
+results = {}
+for name, model in models.items():
+    model.fit(X_train, y_train)
+    y_pred = model.predict(X_test)
+    results[name] = {
+        'MAE': mean_absolute_error(y_test, y_pred),
+        'MSE': mean_squared_error(y_test, y_pred)
+    }
 
-# --- Income Over Time ---
-st.header("💵 Mean and Median Income in Kelantan Over Time")
-# Convert 'date' column to datetime objects
-income_state['date'] = pd.to_datetime(income_state['date'], errors='coerce')
+# Display results in a table
+st.subheader("Model Evaluation Results")
+results_df = pd.DataFrame(results).T
+st.write(results_df.sort_values(by='MAE', ascending=True))
 
-# Filter data for Kelantan
-kelantan_income = income_state[income_state['state'] == 'Kelantan']
+# Visualization: MAE and MSE using Plotly
+st.subheader("MAE and MSE Visualization")
 
-# Group data by year and calculate mean and median income
-kelantan_income_summary = kelantan_income.groupby(kelantan_income['date'].dt.year)[['income_mean', 'income_median']].mean().reset_index()
+# Create a Plotly bar chart for MAE
+fig_mae = px.bar(
+    results_df,
+    x=results_df.index,
+    y='MAE',
+    title='Mean Absolute Error (MAE) for Each Model',
+    labels={'x': 'Model', 'MAE': 'Mean Absolute Error'},
+    color='MAE',
+    color_continuous_scale='Blues'
+)
 
-# Plot the income trends using Plotly
-fig_income = px.line(kelantan_income_summary, x='date', y=['income_mean', 'income_median'],
-                     title='Mean and Median Income in Kelantan Over Time',
-                     labels={'date': 'Year', 'value': 'Income (MYR)', 'variable': 'Income Type'},
-                     line_shape='linear')
+# Create a Plotly bar chart for MSE
+fig_mse = px.bar(
+    results_df,
+    x=results_df.index,
+    y='MSE',
+    title='Mean Squared Error (MSE) for Each Model',
+    labels={'x': 'Model', 'MSE': 'Mean Squared Error'},
+    color='MSE',
+    color_continuous_scale='Oranges'
+)
 
-# Show the plot
-st.plotly_chart(fig_income)
+# Display the charts
+st.plotly_chart(fig_mae, use_container_width=True)
+st.plotly_chart(fig_mse, use_container_width=True)
+
+# Additional Visualization: Feature Importance
+if st.checkbox("Show feature importance for Random Forest"):
+    rf_model = models['Random Forest']
+    feature_importances = rf_model.feature_importances_
+    feature_names = ['item_code', 'month', 'premise_type', 'district']
+
+    # Plotly bar chart for feature importance
+    fig_features = px.bar(
+        x=feature_importances,
+        y=feature_names,
+        orientation='h',
+        title='Feature Importance (Random Forest)',
+        labels={'x': 'Importance', 'y': 'Feature'},
+        color=feature_importances,
+        color_continuous_scale='coolwarm'
+    )
+    st.plotly_chart(fig_features, use_container_width=True
