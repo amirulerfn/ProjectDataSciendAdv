@@ -22,8 +22,8 @@ st.title("Price Prediction App")
 
 # Input fields for categorical features
 item_code = st.selectbox("Select Item Code", categories[0])  # Options for item_code
-description = item_code_descriptions.get(item_code, 'Unknown item code')
-st.write(f"Description: {description}")  # Display item description
+st.info(item_code_descriptions.get(item_code, 'Unknown item code'))  # Show info message with description
+
 premise_type = st.selectbox("Select Premise Type", categories[1])  # Options for premise_type
 district = st.selectbox("Select District", categories[2])  # Options for district
 
