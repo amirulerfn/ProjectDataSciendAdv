@@ -104,20 +104,24 @@ fig.update_layout(
 
 st.plotly_chart(fig, use_container_width=True)
 
-# Additional Visualization: Feature Importance (Random Forest only)
 if st.checkbox("Show feature importance for Random Forest"):
     rf_model = models['Random Forest']
     feature_importances = rf_model.feature_importances_
     feature_names = ['item_code', 'month', 'premise_type', 'district']
 
-    # Plotly bar chart for feature importance
+    # Plotly bar chart for feature importance without color scale
     fig_features = px.bar(
         x=feature_importances,
         y=feature_names,
         orientation='h',
         title='Feature Importance (Random Forest)',
-        labels={'x': 'Importance', 'y': 'Feature'},
-        color=feature_importances,
-        color_continuous_scale='coolwarm'
+        labels={'x': 'Importance', 'y': 'Feature'}
+    )
+    # Update layout for better aesthetics
+    fig_features.update_layout(
+        xaxis_title="Importance",
+        yaxis_title="Feature",
+        template="plotly_white"
     )
     st.plotly_chart(fig_features, use_container_width=True)
+
