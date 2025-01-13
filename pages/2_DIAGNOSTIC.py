@@ -116,4 +116,11 @@ if st.checkbox("Show feature importance for Random Forest"):
         color=feature_importances,
         color_continuous_scale='coolwarm'
     )
-    st.plotly_chart(fig_features, use_container_width=True
+    st.plotly_chart(fig_features, use_container_width=True)
+
+# Sidebar Option for Model Selection
+st.sidebar.subheader("Model Selection")
+selected_models = st.sidebar.multiselect("Select models to display:", list(models.keys()), default=list(models.keys()))
+filtered_results_df = results_df.loc[selected_models]
+st.subheader("Filtered Model Results")
+st.write(filtered_results_df)
