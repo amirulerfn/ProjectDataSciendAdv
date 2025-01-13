@@ -10,20 +10,17 @@ preprocessor = pipeline.named_steps['preprocessor']
 one_hot_encoder = preprocessor.named_transformers_['cat']
 categories = one_hot_encoder.categories_
 
-# Mapping item codes to descriptions
-item_code_descriptions = {
-    "118": "TELUR AYAM GRED A",
-    "119": "TELUR AYAM GRED B",
-    "120": "TELUR AYAM GRED C"
-}
-
 # Streamlit app
 st.title("Price Prediction App")
 
+# Info about item codes
+st.info("Item Codes represent different grades of eggs:\n"
+        "- 118: TELUR AYAM GRED A\n"
+        "- 119: TELUR AYAM GRED B\n"
+        "- 120: TELUR AYAM GRED C")
+
 # Input fields for categorical features
 item_code = st.selectbox("Select Item Code", categories[0])  # Options for item_code
-st.info(item_code_descriptions.get(item_code, 'Unknown item code'))  # Show info message with description
-
 premise_type = st.selectbox("Select Premise Type", categories[1])  # Options for premise_type
 district = st.selectbox("Select District", categories[2])  # Options for district
 
