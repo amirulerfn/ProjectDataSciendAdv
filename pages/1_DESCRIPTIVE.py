@@ -1,8 +1,6 @@
 import pandas as pd 
 import streamlit as st
 import plotly.express as px  # For interactive visualizations
-import matplotlib.pyplot as plt
-import seaborn as sns
 
 # Title of the Streamlit app
 st.title("Descriptive of Eggs In Kelantan 📊")
@@ -148,10 +146,7 @@ if df is not None:
     )
     st.plotly_chart(fig_box)
 
-else:
-    st.error("Unable to load data. Please check the file path or data format.")
-
-   #Visualization 7
+    # Visualization 7: Average egg price by month and grade
     st.subheader("Average Egg Price by Month and Grade")
     # Group data by month and item_code, and get the average price
     monthly_prices = df.groupby(['month', 'item_code'])['price'].mean().reset_index()
@@ -168,3 +163,6 @@ else:
     
     # Show the Plotly chart in Streamlit
     st.plotly_chart(fig)
+
+else:
+    st.error("Unable to load data. Please check the file path or data format.")
