@@ -150,3 +150,21 @@ if df is not None:
 
 else:
     st.error("Unable to load data. Please check the file path or data format.")
+
+   #Visualization 7
+    st.subheader("Average Egg Price by Month and Grade")
+    # Group data by month and item_code, and get the average price
+    monthly_prices = df.groupby(['month', 'item_code'])['price'].mean().reset_index()
+
+    # Create a Plotly line chart
+    fig = px.line(monthly_prices, 
+                  x='month', 
+                  y='price', 
+                  color='item_code', 
+                  markers=True, 
+                  title='Average Egg Price by Month and Grade',
+                  labels={'month': 'Month', 'price': 'Average Price', 'item_code': 'Egg Grade'},
+                  category_orders={'month': ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12']})
+    
+    # Show the Plotly chart in Streamlit
+    st.plotly_chart(fig)
