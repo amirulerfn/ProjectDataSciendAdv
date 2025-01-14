@@ -65,3 +65,55 @@ fig_income = px.line(kelantan_income_summary, x='date', y=['income_mean', 'incom
 
 # Show the plot
 st.plotly_chart(fig_income)
+
+import pandas as pd
+import streamlit as st
+import plotly.express as px
+
+# Streamlit app title
+st.title("Population of Kelantan by District Over Time 📊")
+
+# Function to load and preprocess the dataset
+@st.cache_data
+def load_data():
+    try:
+        # Load the population data
+        population_district = pd.read_csv('population_district.csv')
+
+        # Convert the 'date' column to datetime objects
+        population_district['date'] = pd.to_datetime(population_district['date'])
+
+        # Filter data for Kelantan
+        kelantan_population = population_district[population_district['state'] == 'Kelantan']
+
+        # Group data by district and year, then sum the population
+        kelantan_population_by_district = kelantan_population.groupby(['district', kelantan_population['date'].dt.year])['population'].sum().reset_index()
+        kelantan_population_by_district.columns = ['district', 'year', 'population']  # Renaming columns for clarity
+        return kelantan_population_by_district
+    except Exception as e:
+        st.error(f"Error loading data: {e}")
+        return None
+
+# Load the data
+df = load_data()
+
+if df is not None:
+    # Create the Plotly bar chart
+    fig = px.bar(df, 
+                 x='district', 
+                 y='population', 
+                 color='year', 
+                 labels={'district': 'District', 'population': 'Population', 'year': 'Year'},
+                 title="Population of Kelantan by District Over Time",
+                 barmode='group',  # Group bars by year
+                 color_discrete_sequence=px.colors.qualitative.Set3)
+
+    # Rotate x-axis labels for better readability
+    fig.update_xaxes(tickangle=45)
+
+    # Show the Plotly chart in Streamlit
+    st.plotly_chart(fig)
+
+else:
+    st.error("Unable to load data. Please check the file path or data format.")
+
