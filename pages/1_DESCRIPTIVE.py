@@ -157,7 +157,6 @@ if df is not None:
                   y='price', 
                   color='item_code', 
                   markers=True, 
-                  title='Average Egg Price by Month and Grade',
                   labels={'month': 'Month', 'price': 'Average Price', 'item_code': 'Egg Grade'},
                   category_orders={'month': ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12']})
     
